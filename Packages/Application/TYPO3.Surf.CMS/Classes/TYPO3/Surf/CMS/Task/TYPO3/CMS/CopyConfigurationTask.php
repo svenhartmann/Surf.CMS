@@ -45,9 +45,14 @@ class CopyConfigurationTask extends \TYPO3\Surf\Domain\Model\Task {
 		$commands = array();
 		foreach ($configurations as $configuration) {
 			$targetConfigurationPath = dirname(str_replace($configurationPath, '', $configuration));
+			$deploymentCachePath = $application->getDeploymentPath().'/cache/transfer/typo3conf/';
+
 			if ($node->isLocalhost()) {
 				$commands[] = "mkdir -p '{$targetReleasePath}/Configuration/{$targetConfigurationPath}/'";
 				$commands[] = "cp {$configuration} {$targetReleasePath}/Configuration/{$targetConfigurationPath}/";
+				// copy configuration from Build/Surf/##NAME##/Configuration to cache and rls folder
+				$commands[] = "cp {$configuration} {$deploymentCachePath}";
+				$commands[] = "cp {$configuration} {$targetReleasePath}/typo3conf/";
 			} else {
 				$username = $options['username'];
 				$hostname = $node->getHostname();
