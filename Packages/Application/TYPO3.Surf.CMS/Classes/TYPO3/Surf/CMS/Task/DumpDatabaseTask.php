@@ -45,7 +45,10 @@ class DumpDatabaseTask extends Task {
 		$username = isset($options['username']) ? $options['username'] . '@' : '';
 		$hostname = $node->getHostname();
 		$port = $node->hasOption('port') ? '-P ' . escapeshellarg($node->getOption('port')) : '';
-		$commands[] = "mysqldump -h {$options['sourceHost']} -u{$options['sourceUser']} -p{$options['sourcePassword']} {$options['sourceDatabase']} | ssh {$port} {$username}{$hostname} 'mysql -h {$options['targetHost']} -u{$options['targetUser']} -p{$options['targetPassword']} {$options['targetDatabase']}'";
+
+		$mysqlInsertOnTargetCmd = "mysql -h {$options['targetHost']} -u{$options['targetUser']} -p{$options['targetPassword']} {$options['targetDatabase']}";
+		$mysqlTargetCommand = isset($options['mysqlTargetIsRemoteHost']) ? "ssh {$port} {$username}{$hostname} '{$mysqlInsertOnTargetCmd}'" : $mysqlInsertOnTargetCmd;
+		$commands[] = "mysqldump -h {$options['sourceHost']} -u{$options['sourceUser']} -p{$options['sourcePassword']} {$options['sourceDatabase']} | {$mysqlTargetCommand} ";
 
 		$localhost = new Node('localhost');
 		$localhost->setHostname('localhost');
