@@ -61,6 +61,7 @@ class CMS extends \TYPO3\Surf\Application\BaseApplication {
 		}
 
 		$workflow->addTask('typo3.surf.cms:typo3:cms:backend:lock', 'initialize', $this);
+		$workflow->addTask('typo3.surf.cms:typo3:cms:persistence:mysql:createdump', 'initialize', $this);
 
 		$workflow
 				->afterStage(
