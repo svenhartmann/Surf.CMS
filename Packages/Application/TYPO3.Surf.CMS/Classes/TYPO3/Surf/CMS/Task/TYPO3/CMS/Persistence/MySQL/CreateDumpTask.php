@@ -33,7 +33,7 @@ class CreateDumpTask extends Task {
     public function execute(Node $node, Application $application, Deployment $deployment, array $options = array()) {
         $currentPath = $application->getDeploymentPath() . '/releases/current';
         $mysqlDump = 'mysqldump -u' . getenv('DB_TARGET_USER') . ' -p' . getenv('DB_TARGET_PASS') . ' -h' . getenv('DB_TARGET_HOST');
-        $mysqlDump .= '--default-character-set=utf8 --opt --skip-lock-tables --skip-add-locks --lock-tables=false ' . getenv('DB_TARGET_DBNAME') . ' > '.$currentPath.'/backup.sql';
+        $mysqlDump .= ' --default-character-set=utf8 --opt --skip-lock-tables --skip-add-locks --lock-tables=false ' . getenv('DB_TARGET_DBNAME') . ' > '.$currentPath.'/backup.sql';
 
         $commands[] = $mysqlDump;
 
