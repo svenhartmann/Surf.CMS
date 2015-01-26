@@ -60,6 +60,8 @@ class CMS extends \TYPO3\Surf\Application\BaseApplication {
 			$workflow->addTask('typo3.surf.cms:rsyncFolders', 'initialize', $this);
 		}
 
+		$workflow->addTask('typo3.surf.cms:typo3:cms:backend:lock', 'initialize', $this);
+
 		$workflow
 				->afterStage(
 					'update',
@@ -69,7 +71,8 @@ class CMS extends \TYPO3\Surf\Application\BaseApplication {
 					), $this
 				)
 				->addTask('typo3.surf.cms:typo3:cms:compareDatabase', 'migrate', $this)
-				->afterStage('switch', 'typo3.surf.cms:typo3:cms:flushCaches', $this);
+				->afterStage('switch', 'typo3.surf.cms:typo3:cms:flushCaches', $this)
+				->afterStage('switch', 'typo3.surf.cms:typo3:cms:backend:unlock', $this);
 	}
 
 	/**
