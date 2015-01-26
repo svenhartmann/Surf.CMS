@@ -16,7 +16,7 @@ use TYPO3\Surf\Domain\Model\Task;
 /**
  * This task dumps a complete database from a source system to a target system
  */
-class DumpDatabaseTask extends Task {
+class ImportExternalDatabaseDumpTask extends Task {
 
 	/**
 	 * @Flow\Inject
@@ -67,6 +67,22 @@ class DumpDatabaseTask extends Task {
 	 */
 	public function simulate(Node $node, Application $application, Deployment $deployment, array $options = array()) {
 		$this->execute($node, $application, $deployment, $options);
+	}
+
+	/**
+	 * Rollback the task
+	 *
+	 * @param \TYPO3\Surf\Domain\Model\Node $node
+	 * @param \TYPO3\Surf\Domain\Model\Application $application
+	 * @param \TYPO3\Surf\Domain\Model\Deployment $deployment
+	 * @param array $options
+	 * @return void
+	 */
+	public function rollback(Node $node, Application $application, Deployment $deployment, array $options = array()) {
+		$currentPath = $application->getDeploymentPath() . '/releases/current';
+		$commands[] = 'mysql -u' . getenv('DB_TARGET_USER') . ' -p' . getenv('DB_TARGET_PASS') . ' -h' . getenv('DB_TARGET_HOST') . getenv('DB_TARGET_DBNAME') . ' < '.$currentPath.'/backup.sql;';
+
+		$this->shell->executeOrSimulate($commands, $node, $deployment);
 	}
 
 	/**

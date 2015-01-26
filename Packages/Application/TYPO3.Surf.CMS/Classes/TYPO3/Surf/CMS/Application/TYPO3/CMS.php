@@ -56,12 +56,16 @@ class CMS extends \TYPO3\Surf\Application\BaseApplication {
 		parent::registerTasks($workflow, $deployment);
 
 		if ($deployment->hasOption('initialDeployment') && $deployment->getOption('initialDeployment') === TRUE) {
-			$workflow->addTask('typo3.surf.cms:dumpDatabase', 'initialize', $this);
 			$workflow->addTask('typo3.surf.cms:rsyncFolders', 'initialize', $this);
 		}
 
+		// MySQL Dump
+		$workflow->addTask('typo3.surf.cms:typo3:cms:persistence:mysql:currentdatabasebackup', 'initialize', $this);
+		if ($deployment->hasOption('importExternalDatabaseDump') && $deployment->getOption('importExternalDatabaseDump') === TRUE) {
+			$workflow->addTask('typo3.surf.cms:persistence:mysql:importexternaldatabasedump', 'initialize', $this);
+		}
+
 		$workflow->addTask('typo3.surf.cms:typo3:cms:backend:lock', 'initialize', $this);
-		$workflow->addTask('typo3.surf.cms:typo3:cms:persistence:mysql:createdump', 'initialize', $this);
 
 		$workflow
 				->afterStage(

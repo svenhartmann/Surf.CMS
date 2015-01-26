@@ -13,7 +13,7 @@ use TYPO3\Surf\Domain\Model\Deployment;
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Surf\Domain\Model\Task;
 
-class CreateDumpTask extends Task {
+class CurrentDatabaseBackupTask extends Task {
     /**
      * @Flow\Inject
      * @var \TYPO3\Surf\Domain\Service\ShellCommandService
