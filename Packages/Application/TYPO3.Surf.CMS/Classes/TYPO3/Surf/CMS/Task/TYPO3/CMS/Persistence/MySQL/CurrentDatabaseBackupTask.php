@@ -32,12 +32,15 @@ class CurrentDatabaseBackupTask extends Task {
      */
     public function execute(Node $node, Application $application, Deployment $deployment, array $options = array()) {
         $currentPath = $application->getDeploymentPath() . '/releases/current';
-        $mysqlDump = 'mysqldump -u' . $options['targetUser'] . ' -p' . $options['targetPassword'] . ' -h' . $options['targetHost'];
-        $mysqlDump .= ' --default-character-set=utf8 --opt --skip-lock-tables --skip-add-locks --lock-tables=false ' . $options['targetDatabase'] . ' > '.$currentPath.'/backup.sql';
 
-        $commands[] = $mysqlDump;
+        if(is_dir($currentPath)) {
+            $mysqlDump = 'mysqldump -u' . $options['targetUser'] . ' -p' . $options['targetPassword'] . ' -h' . $options['targetHost'];
+            $mysqlDump .= ' --default-character-set=utf8 --opt --skip-lock-tables --skip-add-locks --lock-tables=false ' . $options['targetDatabase'] . ' > '.$currentPath.'/backup.sql';
 
-        $this->shell->executeOrSimulate($commands, $node, $deployment);
+            $commands[] = $mysqlDump;
+
+            $this->shell->executeOrSimulate($commands, $node, $deployment);
+        }
     }
 
     /**
@@ -64,8 +67,10 @@ class CurrentDatabaseBackupTask extends Task {
      */
     public function rollback(Node $node, Application $application, Deployment $deployment, array $options = array()) {
         $currentPath = $application->getDeploymentPath() . '/releases/current';
-        $commands[] = 'mysql -u' . getenv('DB_TARGET_USER') . ' -p' . getenv('DB_TARGET_PASS') . ' -h' . getenv('DB_TARGET_HOST') . getenv('DB_TARGET_DBNAME') . ' < '.$currentPath.'/backup.sql;';
+        if(file_exists($currentPath.'/backup.sql')) {
+            $commands[] = 'mysql -u' . getenv('DB_TARGET_USER') . ' -p' . getenv('DB_TARGET_PASS') . ' -h' . getenv('DB_TARGET_HOST') . getenv('DB_TARGET_DBNAME') . ' < '.$currentPath.'/backup.sql;';
 
-        $this->shell->executeOrSimulate($commands, $node, $deployment);
+            $this->shell->executeOrSimulate($commands, $node, $deployment);
+        }
     }
 }
