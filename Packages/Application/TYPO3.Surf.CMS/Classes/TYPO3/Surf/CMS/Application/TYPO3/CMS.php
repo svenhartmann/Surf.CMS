@@ -55,17 +55,7 @@ class CMS extends \TYPO3\Surf\Application\BaseApplication {
 	public function registerTasks(\TYPO3\Surf\Domain\Model\Workflow $workflow, \TYPO3\Surf\Domain\Model\Deployment $deployment) {
 		parent::registerTasks($workflow, $deployment);
 
-		if ($deployment->hasOption('initialDeployment') && $deployment->getOption('initialDeployment') === TRUE) {
-			$workflow->addTask('typo3.surf.cms:rsyncFolders', 'initialize', $this);
-		}
-
-		// MySQL Dump
-		$workflow->addTask('typo3.surf.cms:typo3:cms:persistence:mysql:currentdatabasebackup', 'initialize', $this);
-		if ($deployment->hasOption('importExternalDatabaseDump') && $deployment->getOption('importExternalDatabaseDump') === TRUE) {
-			$workflow->addTask('typo3.surf.cms:persistence:mysql:importexternaldatabasedump', 'initialize', $this);
-		}
-
-		$workflow->addTask('typo3.surf.cms:typo3:cms:backend:lock', 'initialize', $this);
+		$this->initializeTasks($workflow, $deployment);
 
 		$workflow
 				->afterStage(
@@ -98,6 +88,25 @@ class CMS extends \TYPO3\Surf\Application\BaseApplication {
 					->afterTask('typo3.surf:composer:localInstall', 'typo3.surf.cms:typo3:cms:createPackageStates', $this);
 				break;
 		}
+	}
+
+	/**
+	 * @param Workflow $workflow
+	 * @param \TYPO3\Surf\Domain\Model\Deployment $deployment
+	 */
+	private function initializeTasks(\TYPO3\Surf\Domain\Model\Workflow $workflow, \TYPO3\Surf\Domain\Model\Deployment $deployment)
+	{
+		if ($deployment->hasOption('initialDeployment') && $deployment->getOption('initialDeployment') === TRUE) {
+			$workflow->addTask('typo3.surf.cms:rsyncFolders', 'initialize', $this);
+		}
+
+		// MySQL Dump
+		$workflow->addTask('typo3.surf.cms:typo3:cms:persistence:mysql:currentdatabasebackup', 'initialize', $this);
+		if ($deployment->hasOption('importExternalDatabaseDump') && $deployment->getOption('importExternalDatabaseDump') === TRUE) {
+			$workflow->addTask('typo3.surf.cms:persistence:mysql:importexternaldatabasedump', 'initialize', $this);
+		}
+
+		$workflow->addTask('typo3.surf.cms:typo3:cms:backend:lock', 'initialize', $this);
 	}
 
 }
