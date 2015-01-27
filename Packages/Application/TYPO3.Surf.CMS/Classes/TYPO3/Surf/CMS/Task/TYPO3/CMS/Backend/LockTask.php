@@ -32,9 +32,10 @@ class LockTask extends Task {
      */
     public function execute(Node $node, Application $application, Deployment $deployment, array $options = array()) {
         $currentPath = $application->getDeploymentPath() . '/releases/current';
-        $commands[] = "'{$currentPath}/typo3/cli_dispatch.phpsh' lowlevel_admin setBElock";
-
-        $this->shell->executeOrSimulate($commands, $node, $deployment);
+        if(is_dir($currentPath)) {
+           $commands[] = "'{$currentPath}/typo3/cli_dispatch.phpsh' lowlevel_admin setBElock";
+           $this->shell->executeOrSimulate($commands, $node, $deployment);
+        }
     }
 
     /**
